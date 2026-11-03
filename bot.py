@@ -4,12 +4,16 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 from telethon import TelegramClient, events
 
-# 1. Dummy Web Server for Render Web Service Port requirement
+# 1. Dummy Web Server for Render Port Check (Supports GET and HEAD)
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"Bot is running 24/7!")
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
 
 def run_http_server():
     port = int(os.environ.get("PORT", 8080))
@@ -22,6 +26,7 @@ threading.Thread(target=run_http_server, daemon=True).start()
 # 2. Telegram Bot Configuration
 api_id = 32062895
 api_hash = 'eb0716c82a6190150c87924f55c1f087'
+bot_token = '9120168706:AAEnt0dbkWFtELjCp8uR_ot4eOxG4Q2fb1s'
 
 # የምትከታተላቸው ቻናሎች እና ግሩፖች
 SOURCE_CHATS = [
@@ -38,10 +43,10 @@ SOURCE_CHATS = [
     -1003234571340
 ]
 
-# መረጃው እንዲላክበት የምትፈልገው ቦታ (የአንተ ቦት username)
 TARGET_BOT = '@AllNewsB_Bot'
 
-client = TelegramClient('All_Info_Session', api_id, api_hash)
+# Initialize client with bot_token directly
+client = TelegramClient('bot_session', api_id, api_hash)
 
 @client.on(events.NewMessage(chats=SOURCE_CHATS))
 async def main(event):
@@ -49,8 +54,11 @@ async def main(event):
         await client.forward_messages(TARGET_BOT, event.message)
         print(f"New post forwarded from {event.chat_id}")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error forwarding message: {e}")
 
 print("Bot is starting...")
-client.start()
+
+# Pass bot_token directly into start() to prevent interactive prompt
+client.start(bot_token=bot_token)
+print("Bot is running successfully!")
 client.run_until_disconnected()
