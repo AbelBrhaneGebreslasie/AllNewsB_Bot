@@ -23,10 +23,9 @@ def run_http_server():
 # Start HTTP Server in background thread
 threading.Thread(target=run_http_server, daemon=True).start()
 
-# 2. Telegram Bot Configuration
+# 2. Telegram UserBot Configuration
 api_id = 32062895
 api_hash = 'eb0716c82a6190150c87924f55c1f087'
-bot_token = '9120168706:AAEnt0dbkWFtELjCp8uR_ot4eOxG4Q2fb1s'
 
 # የምትከታተላቸው ቻናሎች እና ግሩፖች
 SOURCE_CHATS = [
@@ -45,7 +44,7 @@ SOURCE_CHATS = [
 
 TARGET_BOT = '@AllNewsB_Bot'
 
-# Initialize client with bot_token directly
+# Loads 'bot_session.session' directly
 client = TelegramClient('bot_session', api_id, api_hash)
 
 @client.on(events.NewMessage(chats=SOURCE_CHATS))
@@ -56,9 +55,9 @@ async def main(event):
     except Exception as e:
         print(f"Error forwarding message: {e}")
 
-print("Bot is starting...")
+print("UserBot is starting...")
 
-# Pass bot_token directly into start() to prevent interactive prompt
-client.start(bot_token=bot_token)
-print("Bot is running successfully!")
+# Start client using the uploaded session file (No token, no phone prompt needed)
+client.start()
+print("UserBot is running successfully and listening to channels!")
 client.run_until_disconnected()
